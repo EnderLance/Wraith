@@ -1,0 +1,7 @@
+name: Wraith
+main: ca.enderlance.Wraith.Wraith
+version: 0.2
+description: Adds the wraith race.
+commands:
+  w:
+    description: Root command for wraiths.
