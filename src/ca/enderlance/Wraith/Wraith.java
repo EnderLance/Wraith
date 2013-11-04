@@ -8,12 +8,16 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
-public class Wraith extends JavaPlugin
+public class Wraith extends JavaPlugin implements Listener
 {
 	public static Wraith plugin;
 	public final Logger logger = Logger.getLogger("Minecraft");
@@ -22,6 +26,8 @@ public class Wraith extends JavaPlugin
 	{
 		org.bukkit.plugin.PluginDescriptionFile pdfFile = getDescription();
 		this.logger.info(pdfFile.getName() + " Version " + pdfFile.getVersion() + " is ready to reap you!");
+		PluginManager pm = getServer().getPluginManager();
+		pm.registerEvents(this, this);
 	}
 	
 	public void onDisable() 
@@ -59,56 +65,129 @@ public class Wraith extends JavaPlugin
 	public void onRightClickEntity(PlayerInteractEntityEvent e)
 	{
 		Player player = (Player) e.getPlayer();
-		LivingEntity tentity = (LivingEntity) e.getRightClicked();
-		drainEntity(player, tentity, 1.00);
+		if(e.getRightClicked() instanceof LivingEntity)
+		{
+			LivingEntity tentity = (LivingEntity) e.getRightClicked();
+			drainEntity(player, tentity, 1.00);
+		}
+		else if(e.getRightClicked() instanceof Player)
+		{
+			Player tplayer = (Player) e.getRightClicked();
+			drainEntity(player, tplayer, 1.00);
+		}
 	}
-
+	
+	@Deprecated
 	@EventHandler
 	public void onRightClickPlayer(PlayerInteractEntityEvent e)
 	{
 		Player player = (Player) e.getPlayer();
-		Player tplayer = (Player) e.getRightClicked();
-		drainPlayer(player, tplayer, 1.00);
+		if(e.getRightClicked() instanceof Player)
+		{
+			Player tplayer = (Player) e.getRightClicked();
+			drainPlayer(player, tplayer, 1.00);	
+		}
 	}
 	
 	public void drainEntity(Player player, LivingEntity entity, double damage)
 	{
-		if (player.hasPermission("wraith.drain1.entity") && !player.hasPermission("myrace.wraith.drain2"))
+		if (player.hasPermission("wraith.drain1") && !player.isOp())
 		{
 			if ((entity instanceof LivingEntity))
 			{
-				((LivingEntity) entity).setHealth(((LivingEntity) entity).getHealth() - damage*2);
-				player.setHealth(player.getHealth() + damage);
+				damage = damage*4;
+				if((entity.getHealth() - damage) < 0)
+				{
+					damage = entity.getHealth()-0.1;
+				}
+				entity.damage(damage);
+				entity.damage(0);
+				player.setHealth(player.getHealth() + damage/2);
+				player.sendMessage(ChatColor.DARK_GRAY + "You have devoured a soul.");
+			}
+			if(entity instanceof Player)
+			{
+				damage = damage*4;
+				if((entity.getHealth() - damage) < 0)
+				{
+					damage = entity.getHealth()-0.1;
+				}
+				entity.damage(damage);
+				((Player) entity).setFoodLevel(((Player) entity).getFoodLevel()-1);
+				player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 100, 1));
+				entity.damage(0);
+				player.setHealth(player.getHealth() + damage/2);
 				player.sendMessage(ChatColor.DARK_GRAY + "You have devoured a soul.");
 			}
 		}
-		else if (player.hasPermission("wraith.drain2.entity") && !player.hasPermission("myrace.wraith.drain3"))
+		else if (player.hasPermission("wraith.drain2") && !player.isOp())
 		{
 			if ((entity instanceof LivingEntity))
 			{
-				((LivingEntity) entity).setHealth(((LivingEntity) entity).getHealth() - damage*4);
-				player.setHealth(player.getHealth() + damage*2);
+				damage = damage*8;
+				if((entity.getHealth() - damage) < 0)
+				{
+					damage = entity.getHealth()-0.1;
+				}
+				entity.damage(damage);
+				entity.damage(0);
+				player.setHealth(player.getHealth() + damage/2);
+				player.sendMessage(ChatColor.DARK_GRAY + "You have devoured a soul.");
+			}
+			if(entity instanceof Player)
+			{
+				damage = damage*8;
+				if((entity.getHealth() - damage) < 0)
+				{
+					damage = entity.getHealth()-0.1;
+				}
+				entity.damage(damage);
+				((Player) entity).setFoodLevel(((Player) entity).getFoodLevel()-1);
+				player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 100, 1));
+				entity.damage(0);
+				player.setHealth(player.getHealth() + damage/2);
 				player.sendMessage(ChatColor.DARK_GRAY + "You have devoured a soul.");
 			}
 		}
-		else if (player.hasPermission("wraith.drain3.entity"))
+		else if (player.hasPermission("wraith.drain3"))
 		{
 			if ((entity instanceof LivingEntity))
 			{
-				((LivingEntity) entity).setHealth(((LivingEntity) entity).getHealth() - damage*6);
-				player.setHealth(player.getHealth() + damage*3);
+				damage = damage*12;
+				if((entity.getHealth() - damage) < 0)
+				{
+					damage = entity.getHealth()-0.1;
+				}
+				entity.damage(damage);
+				entity.damage(0);
+				player.setHealth(player.getHealth() + damage/2);
+				player.sendMessage(ChatColor.DARK_GRAY + "You have devoured a soul.");
+			}
+			else if(entity instanceof Player)
+			{
+				damage = damage*12;
+				if((entity.getHealth() - damage) < 0)
+				{
+					damage = entity.getHealth()-0.1;
+				}
+				entity.damage(damage);
+				((Player) entity).setFoodLevel(((Player) entity).getFoodLevel()-1);
+				entity.damage(0);
+				player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 100, 1));
+				player.setHealth(player.getHealth() + damage/2);
 				player.sendMessage(ChatColor.DARK_GRAY + "You have devoured a soul.");
 			}
 		}
+		
 	}
 	
-	public void drainPlayer(Player player, LivingEntity entity, double damage)
+	@Deprecated
+	public void drainPlayer(Player player, Player tplayer, double damage)
 	{
 		if (player.hasPermission("wraith.drain1.player") && !player.isOp())
 		{
-			if(entity instanceof Player)
+			if(tplayer instanceof Player)
 			{
-				Player tplayer = (Player) entity;
 				tplayer.setHealth(tplayer.getHealth() - damage*2);
 				player.setHealth(player.getHealth() + damage);
 				player.sendMessage(ChatColor.DARK_GRAY + "You have devoured a soul.");
@@ -116,9 +195,8 @@ public class Wraith extends JavaPlugin
 		}
 		else if (player.hasPermission("wraith.drain2.player") && !player.isOp())
 		{
-			if(entity instanceof Player)
+			if(player instanceof Player)
 			{
-				Player tplayer = (Player) entity;
 				tplayer.setHealth(tplayer.getHealth() - damage*4);
 				player.setHealth(player.getHealth() + damage*2);
 				player.sendMessage(ChatColor.DARK_GRAY + "You have devoured a soul.");
@@ -126,9 +204,8 @@ public class Wraith extends JavaPlugin
 		}
 		else if (player.hasPermission("wraith.drain3.player"))
 		{
-			if(entity instanceof Player)
+			if(player instanceof Player)
 			{
-				Player tplayer = (Player) entity;
 				tplayer.setHealth(tplayer.getHealth() - damage*6);
 				player.setHealth(player.getHealth() + damage*3);
 				player.sendMessage(ChatColor.DARK_GRAY + "You have devoured a soul.");
@@ -137,22 +214,30 @@ public class Wraith extends JavaPlugin
 	}
 	
 	@EventHandler
-    public void onPlayerToggleSneak(PlayerToggleSneakEvent event){
+    public void onPlayerToggleSneak(PlayerToggleSneakEvent event)
+	{
 		Player[] players;
 		Player player = (Player) event.getPlayer();
-		players = getServer().getOnlinePlayers();
-		if(player.hasPermission("wraith.dissipate.sneak") && player.isSneaking() && player.isFlying() == false){
-			for(int i = 0; i< players.length; i++){
-				players[i].hidePlayer(player);
+		if(player.hasPermission("wraith.dissipate.sneak"))
+		{
+			players = getServer().getOnlinePlayers();
+			if(event.isSneaking() == true && player.isFlying()==false)
+			{
 				player.hidePlayer(player);
+				for(int i = 0; i< players.length; i++)
+				{
+					players[i].hidePlayer(player);
+				}
+			}
+			else
+			{
+				player.showPlayer(player);
+				for(int i = 0; i< players.length; i++)
+				{
+					players[i].showPlayer(player);
+				}
 			}
 		}
-		if(player.hasPermission("wraith.dissipate.sneak") && !player.isFlying()){
-	    	for(int i = 0; i< players.length; i++){
-				players[i].showPlayer(player);
-				player.showPlayer(player);
-			}
-		}	
 	}
 	
 	@EventHandler
@@ -160,21 +245,24 @@ public class Wraith extends JavaPlugin
 	{
 		Player[] players;
 		Player player = (Player) event.getPlayer();
-		players = getServer().getOnlinePlayers();
-		if(player.hasPermission("wraith.dissipate.run") && player.isSprinting() && !player.isFlying())
+		if(player.hasPermission("wraith.dissipate.run"))
 		{
-			for(int i = 0; i< players.length; i++)
+			players = getServer().getOnlinePlayers();
+			if(event.isSprinting()==true)
 			{
-				players[i].hidePlayer(player);
 				player.hidePlayer(player);
+				for(int i = 0; i< players.length; i++)
+				{
+					players[i].hidePlayer(player);
+				}
 			}
-		}
-		if(player.hasPermission("wraith.dissipate.run") && !player.isFlying())
-		{
-			for(int i = 0; i< players.length; i++)
+			else
 			{
-				players[i].showPlayer(player);
 				player.showPlayer(player);
+				for(int i = 0; i< players.length; i++)
+				{
+					players[i].showPlayer(player);
+				}
 			}
 		}
 	}
@@ -190,7 +278,7 @@ public class Wraith extends JavaPlugin
 				{
 					player.sendMessage(ChatColor.DARK_GRAY + "-------- WRAITH --------");
 					player.sendMessage("");
-					player.sendMessage(ChatColor.DARK_RED + "/w show " + ChatColor.DARK_GRAY + "-- Display all wraiths.");
+					//player.sendMessage(ChatColor.DARK_RED + "/w show " + ChatColor.DARK_GRAY + "-- Display all wraiths.");
 					player.sendMessage(ChatColor.DARK_RED + "/w reap <player> " + ChatColor.DARK_GRAY + "-- Steal health from a specified player.");
 					player.sendMessage("");
 				}
