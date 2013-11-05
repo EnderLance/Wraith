@@ -2,6 +2,8 @@ package ca.enderlance.Wraith;
 
 import java.util.logging.Logger;
 
+import me.Blanclour.AmestriaRaceCore.AmestriaRaceCore;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -39,8 +41,8 @@ public class Wraith extends JavaPlugin implements Listener
 	
 	public boolean reapSoulPlayer(Player player, Player tplayer, double damage)
 	{
-	    if(player.hasPermission("wraith.reap"))
-	    {
+		if (AmestriaRaceCore.getRace(player).equalsIgnoreCase("Wraith"))
+		{
 	        if(damage >= 20.00)
 	        {
 	        	damage = 19.00;
@@ -65,15 +67,18 @@ public class Wraith extends JavaPlugin implements Listener
 	public void onRightClickEntity(PlayerInteractEntityEvent e)
 	{
 		Player player = (Player) e.getPlayer();
-		if(e.getRightClicked() instanceof LivingEntity)
+		if (AmestriaRaceCore.getRace(player).equalsIgnoreCase("Wraith"))
 		{
-			LivingEntity tentity = (LivingEntity) e.getRightClicked();
-			drainEntity(player, tentity, 1.00);
-		}
-		else if(e.getRightClicked() instanceof Player)
-		{
-			Player tplayer = (Player) e.getRightClicked();
-			drainEntity(player, tplayer, 1.00);
+			if(e.getRightClicked() instanceof LivingEntity)
+			{
+				LivingEntity tentity = (LivingEntity) e.getRightClicked();
+				drainEntity(player, tentity, 1.00);
+			}
+			else if(e.getRightClicked() instanceof Player)
+			{
+				Player tplayer = (Player) e.getRightClicked();
+				drainEntity(player, tplayer, 1.00);
+			}
 		}
 	}
 	
@@ -218,7 +223,7 @@ public class Wraith extends JavaPlugin implements Listener
 	{
 		Player[] players;
 		Player player = (Player) event.getPlayer();
-		if(player.hasPermission("wraith.dissipate.sneak"))
+		if(AmestriaRaceCore.getRace(player).equalsIgnoreCase("Wraith") && player.hasPermission("wraith.dissipate.sneak"))
 		{
 			players = getServer().getOnlinePlayers();
 			if(event.isSneaking() == true && player.isFlying()==false)
@@ -245,7 +250,7 @@ public class Wraith extends JavaPlugin implements Listener
 	{
 		Player[] players;
 		Player player = (Player) event.getPlayer();
-		if(player.hasPermission("wraith.dissipate.run"))
+		if(AmestriaRaceCore.getRace(player).equalsIgnoreCase("Wraith") && player.hasPermission("wraith.dissipate.run"))
 		{
 			players = getServer().getOnlinePlayers();
 			if(event.isSprinting()==true)
@@ -272,7 +277,7 @@ public class Wraith extends JavaPlugin implements Listener
 		Player player = (Player) sender;
 		if(label.equalsIgnoreCase("w"))
 		{
-			if(player.hasPermission("wraith.cmd"))
+			if(AmestriaRaceCore.getRace(player).equalsIgnoreCase("Wraith"))
 			{
 				if(args.length == 0)
 				{
